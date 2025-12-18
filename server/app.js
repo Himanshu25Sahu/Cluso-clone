@@ -3,11 +3,17 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { authRoutes } from "./routes/authRoutes.js";
 import { projectRouter } from "./routes/projectRoutes.js";
+import dotenv from "dotenv";
+dotenv.config();  
 
 export const app = express();
 
 // Middlewares
-app.use(cors());
+console.log(process.env.FRONTEND_URL)
+app.use(cors({
+  origin:process.env.FRONTEND_URL,
+  credentials:true}
+));
 app.use(express.json());
 app.use(cookieParser());
 
