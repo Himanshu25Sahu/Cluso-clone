@@ -7,7 +7,6 @@ A professional full-stack clone of **Clueso.io**, built as a job assignment to d
 
 This project recreates Clueso’s core workflows — onboarding, dashboard, content recording/upload, project management, and AI-assisted insights — with a focus on **functionality, clarity, and production-minded architecture**, rather than pixel-perfect UI.
 
-🎥 **Demo Video:** *(link to be added)*
 📦 **GitHub Repository:** *https://github.com/Himanshu25Sahu/Cluso-clone*
 
 ---
