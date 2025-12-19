@@ -192,3 +192,13 @@
   90% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+
+.demo-video {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: cover;        /* Ensures video fills container nicely */
+  display: block;
+  border-radius: 16px;      /* Matches your box-shadow container */
+}

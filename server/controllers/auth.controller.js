@@ -65,3 +65,13 @@ export const logout = (req, res) => {
     .status(200)
     .json({ success: true, message: "Logged out successfully" });
 };
+
+// routes/authRoutes.js or similar
+export const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password")
+    res.json({ success: true, user })
+  } catch (err) {
+    res.status(401).json({ success: false })
+  }
+}

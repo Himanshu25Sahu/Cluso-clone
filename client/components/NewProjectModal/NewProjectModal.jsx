@@ -1,10 +1,43 @@
 "use client"
 import "./NewProjectModal.css"
 
-function NewProjectModal({ onClose, onNavigate }) {
-  const handleCreateProject = () => {
-    onClose()
-    onNavigate("editor")
+function NewProjectModal({ onClose }) {
+  // This function creates a hidden file input and triggers it based on the selected option
+  const handleOptionClick = (acceptTypes) => {
+    // Create a temporary hidden file input
+    const input = document.createElement("input")
+    input.type = "file"
+    input.style.display = "none"
+
+    // Set accept attribute based on option
+    if (acceptTypes === "video") {
+      input.accept = "video/*"
+    } else if (acceptTypes === "slides") {
+      input.accept = ".pdf,.ppt,.pptx"
+    } else if (acceptTypes === "record") {
+      input.accept = "video/*"
+      // Optional: try to open camera/screen recorder on mobile
+      // input.capture = "environment"
+    }
+    // For "blank" project, no file needed — just close and go to editor later if you want
+
+    // When user selects a file
+    input.onchange = (e) => {
+      const file = e.target.files?.[0]
+      if (file) {
+        // We'll let Dashboard handle the actual upload via its handleUpload function
+        // So we dispatch a custom event that Dashboard can listen to
+        window.dispatchEvent(
+          new CustomEvent("modalFileSelected", { detail: { file, acceptTypes } })
+        )
+      }
+      onClose() // Always close modal after selection
+    }
+
+    // Trigger the file picker
+    document.body.appendChild(input)
+    input.click()
+    document.body.removeChild(input)
   }
 
   return (
@@ -21,7 +54,11 @@ function NewProjectModal({ onClose, onNavigate }) {
         </div>
 
         <div className="modal-body">
-          <div className="project-option" onClick={handleCreateProject}>
+          <div className="project-option" onClick={() => {
+            onClose()
+            // Optional: go to blank editor if you implement it later
+            // onNavigate("editor") // you can add this back if needed
+          }}>
             <div className="option-icon primary">
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M12 5v14m7-7H5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -33,7 +70,7 @@ function NewProjectModal({ onClose, onNavigate }) {
             </div>
           </div>
 
-          <div className="project-option recommended" onClick={handleCreateProject}>
+          <div className="project-option recommended" onClick={() => handleOptionClick("record")}>
             <div className="option-icon">
               <svg viewBox="0 0 24 24" fill="none">
                 <rect x="4" y="4" width="16" height="12" rx="2" stroke="currentColor" strokeWidth="2" />
@@ -51,10 +88,10 @@ function NewProjectModal({ onClose, onNavigate }) {
               <h3 className="option-title">Capture screen-recording</h3>
               <p className="option-description">Record any process on your screen.</p>
             </div>
-            <span className="recommended-badge">⚡ Recommended</span>
+            <span className="recommended-badge">Recommended</span>
           </div>
 
-          <div className="project-option" onClick={handleCreateProject}>
+          <div className="project-option" onClick={() => handleOptionClick("video")}>
             <div className="option-icon">
               <svg viewBox="0 0 24 24" fill="none">
                 <path d="M8 5v14l11-7z" fill="currentColor" />
@@ -67,7 +104,7 @@ function NewProjectModal({ onClose, onNavigate }) {
             </div>
           </div>
 
-          <div className="project-option" onClick={handleCreateProject}>
+          <div className="project-option" onClick={() => handleOptionClick("slides")}>
             <div className="option-icon">
               <svg viewBox="0 0 24 24" fill="none">
                 <rect x="6" y="4" width="12" height="16" rx="1" stroke="currentColor" strokeWidth="2" />

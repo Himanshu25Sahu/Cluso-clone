@@ -85,9 +85,19 @@ function LandingPage({ onNavigate }) {
           </div>
         </div>
 
-        <div className="hero-demo">
-          <img src="/images/image.png" alt="Demo" className="demo-image" />
-        </div>
+<div className="hero-demo">
+  <video 
+    className="demo-video"
+    autoPlay
+    muted
+    loop
+    playsInline
+   
+  >
+    <source src="/cluso_landing_vid.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
       </section>
     </div>
   )

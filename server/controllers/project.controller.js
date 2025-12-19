@@ -1,4 +1,7 @@
 import { Project } from "../models/Project.js";
+import path from "path";
+import fs from "fs";
+import { User } from "../models/User.js";
 
 /* Create Project */
 export const createProject = async (req, res) => {
@@ -100,5 +103,59 @@ export const generateProjectInsights = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to generate insights" });
+  }
+};
+
+// controllers/project.controller.js
+
+export const createProjectFromUpload = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const { originalname, filename, mimetype, size } = req.file;
+
+    const allowedVideoTypes = ["video/mp4", "video/webm", "video/quicktime"];
+    const allowedDocTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.presentationml.presentation"];
+
+    const isVideo = allowedVideoTypes.includes(mimetype);
+    const isDoc = allowedDocTypes.includes(mimetype);
+
+    if (!isVideo && !isDoc) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ message: "Invalid file type. Only MP4, WebM, PDF, PPTX allowed." });
+    }
+
+    // Determine project type based on file
+    let projectType = "upload";
+    if (mimetype.includes("pdf") || mimetype.includes("presentation")) {
+      projectType = "slides";
+    }
+
+    const newProject = await Project.create({
+      user: req.user._id,                    // ← CRITICAL FIX: use _id
+      title: originalname.split('.').slice(0, -1).join('.') || "Untitled",
+      type: projectType,
+      status: "uploaded",                    // ← Now valid because we updated enum
+      filePath: `/uploads/${filename}`,
+      originalFileName: originalname,
+      fileType: isVideo ? "video" : "document",
+      mimeType: mimetype,
+      fileSize: size,
+      script: "",
+    });
+
+    res.status(201).json({
+      success: true,
+      project: newProject,
+      message: "File uploaded and project created successfully",
+    });
+  } catch (error) {
+    console.error("Upload error:", error);
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(500).json({ message: "Server error during upload" });
   }
 };
